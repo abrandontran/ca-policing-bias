@@ -4,7 +4,7 @@
 
 
 Group Members:  
-Brandon Tran (Pomona 2021) - Project Manager and Director of Computation. 
+Brandon Tran (Pomona 2021) - Project Manager and Director of Computation. <br />
 Preet Khowaja (Pomona 2020) - Task Manager and Director of Research. 
 
 
