@@ -3,9 +3,9 @@
 ## Searching for police bias in traffic arrest trends across major U.S cities
 
 
-Group Members:
-Brandon Tran (Pomona 2021) - Project Manager and Director of Computation
-Preet Khowaja (Pomona 2020) - Task Manager and Director of Research
+Group Members:  
+Brandon Tran (Pomona 2021) - Project Manager and Director of Computation. 
+Preet Khowaja (Pomona 2020) - Task Manager and Director of Research. 
 
 
 Why this is exciting:
