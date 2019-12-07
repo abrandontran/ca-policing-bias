@@ -1,0 +1,6 @@
+PROGRESS LOG
+
+DATE        PROGRESS
+
+12/5/19     Uploaded data for SF to the Data folder. Began exploration in 'Data Exploration.R' and reformatted data so that variables are appropriately characterized (factors,
+            chracters, boolean, etc.).  Used this to see that in a RF, heavy variable importance assigned to 'subject_race' when predicting 'outcome.'
