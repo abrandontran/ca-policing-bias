@@ -5,7 +5,7 @@ library(readr)
 data <- url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds')
 test <- readRDS(file = data)
 
-#San Francisco Data
+#San Francisco Data NOTE THIS NO LONGER WORKS BECAUSE WE WILL BE ACCESSING THE RDS FILES LIVE.  CSV FILES ARE TOO BIG FOR GIT.
 sf <- read_csv("Data/san_francisco.csv", 
           col_types = cols(arrest_made = col_logical(), 
               date = col_date(format = "%Y-%m-%d"), 
