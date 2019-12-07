@@ -18,7 +18,19 @@ datasf <- url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca
 testSF <- readRDS(file = data)
 ```
 ```{r}
+library(httr)
+library(jsonlite)
+options(stringsAsFactors = FALSE) #turning off the R feature that turns the data into strings
 
+path <- "https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400"
+request <- GET(url = path, 
+               query = list(
+                 lat = 53.421813,
+                 lng = -2.330251,
+                 date = "2018-05")
+               )
+
+response <- content(request, as = "text", encoding = "UTF-8")
 ```
 
 ## Including Plots
