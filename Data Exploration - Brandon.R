@@ -1,4 +1,4 @@
-#Data Exploration
+#### Initial Data Exploration
 
 library(readr)
 
@@ -32,3 +32,18 @@ forest.sf <- randomForest(outcome~subject_race + subject_sex, data = sf, subset 
 
 forest.sf2 <- randomForest(outcome~subject_race + subject_sex + search_conducted + search_vehicle, 
                            data = sf, subset = sf.train, importance = TRUE, na.action = na.omit)
+
+
+#### Processing Data for usage in API
+library(dplyr)
+
+sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds'))
+sf.api <- sf %>%
+  select(c(date, time, lat, lng, subject_race))
+
+
+
+
+
+
+
