@@ -5,6 +5,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 ## R Markdown
@@ -31,6 +32,19 @@ request <- GET(url = path,
                )
 
 response <- content(request, as = "text", encoding = "UTF-8")
+df <- fromJSON(response, flatten = TRUE) %>% 
+  data.frame()
+df <- select(df,
+             month, category, 
+             location = location.street.name,
+             long = location.longitude,
+             lat = location.latitude)
+```
+
+```{r}
+sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds'))
+sf.api <- sf %>%
+  select(c(date, time, lat, lng, subject_race))
 ```
 
 ## Including Plots
