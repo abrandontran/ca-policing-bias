@@ -41,9 +41,26 @@ sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp2
 sf.api <- sf %>%
   select(c(date, time, lat, lng, subject_race))
 
+for (url in urls) {
+  
+}
 
 
+#### Using API to classify as day/night
+library(httr)
+library(jsonlite)
+options(stringsAsFactors = FALSE)
+
+request <- GET(url = 'https://api.sunrise-sunset.org/json', query = list(
+                 lat = 53.421813,
+                 lng = -2.330251,
+                 date = "2018-05-01"))
+
+response <- content(request, as = "text", encoding = "UTF-8")
 
 
+#### Using StreamMetabolism to classify as day/night
+library(StreamMetabolism)
 
+sunrise.set(34.042220, -117.622500, "2019-12-07", timezone="UTC+8")
 
