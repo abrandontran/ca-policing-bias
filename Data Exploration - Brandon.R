@@ -92,5 +92,21 @@ mutate_class <- function(df) {
   return(classifications)
 }
 
+#Python version
+# library(reticulate)
+# 
+# import pandas
+# 
+# def classify_df(df):
+#   """Takes a dataframe and adds the boolean day/night classification found via `classify` as a new column."""
+# 
+# classifications = []
+# 
+# for i in range(len(df.index)):
+#   classifications.append('test')
+# 
+# return classifications
+
+
 
 
