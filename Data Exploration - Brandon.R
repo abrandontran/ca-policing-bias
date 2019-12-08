@@ -36,15 +36,11 @@ forest.sf2 <- randomForest(outcome~subject_race + subject_sex + search_conducted
 
 #### Processing Data for usage in API
 library(dplyr)
+library(hms)
 
 sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds'))
 sf.api <- sf %>%
   select(c(date, time, lat, lng, subject_race))
-
-for (url in urls) {
-  
-}
-
 
 #### Using API to classify as day/night
 library(httr)
@@ -61,6 +57,26 @@ response <- content(request, as = "text", encoding = "UTF-8")
 
 #### Using StreamMetabolism to classify as day/night
 library(StreamMetabolism)
-
 sunrise.set(34.042220, -117.622500, "2019-12-07", timezone="UTC+8")
+
+
+#### Function to take data input, return sunrise/sunset time, and then classify as a new mutated variable.
+
+classify <- function(lat, long, date, time) {
+  #Takes lat, long, time, and date as input and classifies TRUE if the time is at day and FALSE if at night.
+  
+  sunrise <- sunrise.set(lat, long, date)$sunrise
+  attributes(sunrise)$tzone <- 'America/Los_Angeles'
+  sunrise <- as_hms(sunrise)
+  
+  sunset <- sunrise.set(lat, long, date)$sunset
+  attributes(sunset)$tzone <- 'America/Los_Angeles'
+  sunset <- as_hms(sunset)
+
+  if (time < sunset & time >= sunrise)
+    return(TRUE)
+  
+  else
+    return(FALSE)
+}
 
