@@ -80,3 +80,17 @@ classify <- function(lat, long, date, time) {
     return(FALSE)
 }
 
+mutate_class <- function(df) {
+  #Takes a dataframe and adds the boolean day/night classification found via `classify` as a new column.
+  
+  classifications <- c()
+  
+  for (i in 1:nrow(df)) {
+    classifications <- classifications + classify(df$lat[i], df$long[i], df$date[i])
+  }
+  
+  return(classifications)
+}
+
+
+

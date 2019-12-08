@@ -1,0 +1,86 @@
+---
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Brandon Tran\
+MATH 154
+
+# Work in Progress for Final Project
+
+## Generating Test Data
+For testing purposes, we will utilize the dataset for San Francisco.  Note that we will have to omit any observations with $NA$ entries for any one of `lat`, `lng`, `date`, `time`, and `subject_race`.
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds'))
+sf.api <- sf %>%
+  select(c(date, time, lat, lng, subject_race)) %>%
+  drop_na()
+```
+
+## Functions to Classify Times as Day or Night
+First, we'll write a helper function that utilizes `POSIXct`, `hms`, and the data itself in order to first determine the sunrise and sunset times for a given day and coordinates, then return a boolean evaluating to `True` if the observed time was during the day and `False` if it occurred at night.
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(StreamMetabolism)
+library(hms)
+```
+
+```{r}
+classify <- function(lat, long, date, time) {
+  #Takes lat, long, time, and date as input and classifies TRUE if the time is at day and FALSE if at night.
+  
+  sunrise <- sunrise.set(lat, long, date)$sunrise
+  attributes(sunrise)$tzone <- 'America/Los_Angeles'
+  sunrise <- as_hms(sunrise)
+  
+  sunset <- sunrise.set(lat, long, date)$sunset
+  attributes(sunset)$tzone <- 'America/Los_Angeles'
+  sunset <- as_hms(sunset)
+
+  if (time < sunset && time >= sunrise)
+    return(TRUE)
+  
+  else
+    return(FALSE)
+}
+```
+
+Next, we'll write a second function that will apply our helper function to any given dataframe, appending the booleans as a new column variable.
+
+```{r}
+mutate.class <- function(df) {
+  #Takes a dataframe and adds the boolean day/night classification found via `classify` as a new column.
+  
+  classifications <- c()
+  
+  for (i in 1:nrow(df)) {
+    classifications[i] <- classify(df$lat[i], df$lng[i], df$date[i], df$time[i])
+  }
+  
+  df <- df %>%
+    mutate(daytime = classifications)
+}
+```
+
+This function can now be used to generate `True` and `False` classifications for our new variable, `daytime`.  Example code is included below, but will take long to compile if using the entire test dataset `sf.api`.
+
+```{r, include = FALSE}
+sf.daytime <- mutate.class(sf.api)
+head(sf.daytime)
+```
+
+
+
+
+
+
+
+
