@@ -22,23 +22,14 @@ testSF <- readRDS(file = data)
 library(httr)
 library(jsonlite)
 library(StreamMetabolism)
-options(stringsAsFactors = FALSE) #turning off the R feature that turns the data into strings
 
-path <- "https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400"
-request <- GET(url = path, 
-               query = list(
-                 lat = sf.api$lat[1],
-                 lng = sf.api$lng[1],
-                 date = sf.api$date[1])
-               )
-
-response <- content(request, as = "text", encoding = "UTF-8")
 ```
 
 ```{r}
 sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds'))
 sf.api <- sf %>%
   select(c(date, time, lat, lng, subject_race))
+
 ```
 
 ## Including Plots
