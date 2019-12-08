@@ -21,24 +21,18 @@ testSF <- readRDS(file = data)
 ```{r}
 library(httr)
 library(jsonlite)
+library(StreamMetabolism)
 options(stringsAsFactors = FALSE) #turning off the R feature that turns the data into strings
 
 path <- "https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400"
 request <- GET(url = path, 
                query = list(
-                 lat = 53.421813,
-                 lng = -2.330251,
-                 date = "2018-05")
+                 lat = sf.api$lat[1],
+                 lng = sf.api$lng[1],
+                 date = sf.api$date[1])
                )
 
 response <- content(request, as = "text", encoding = "UTF-8")
-df <- fromJSON(response, flatten = TRUE) %>% 
-  data.frame()
-df <- select(df,
-             month, category, 
-             location = location.street.name,
-             long = location.longitude,
-             lat = location.latitude)
 ```
 
 ```{r}
