@@ -18,7 +18,7 @@ library(dplyr)
 library(tidyr)
 ```
 
-```{r}
+```
 sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds'))
 sf.api <- sf %>%
   select(c(date, time, lat, lng, subject_race)) %>%
@@ -56,7 +56,7 @@ classify <- function(lat, long, date, time) {
 Next, we'll write a second function that will apply our helper function to any given dataframe, appending the booleans as a new column variable.
 
 ```{r}
-mutate.class <- function(df) {
+mutateClass <- function(df) {
   #Takes a dataframe and adds the boolean day/night classification found via `classify` as a new column.
   
   classifications <- c()
@@ -70,17 +70,98 @@ mutate.class <- function(df) {
 }
 ```
 
-This function can now be used to generate `True` and `False` classifications for our new variable, `daytime`.  Example code is included below, but will take long to compile if using the entire test dataset `sf.api`.
+This function can now be used to generate `True` and `False` classifications for our new variable, `daytime`.
 
-```{r, include = FALSE}
-sf.daytime <- mutate.class(sf.api)
-head(sf.daytime)
+## Putting it All Together
+We now have some data, and we have functions that will classify an observation (really, a traffic stop) as during or not during the daytime.  We now want to parse data together to form an appropriate sample of the State of California, which will put us in a good place for both our Shiny visualization and the statistical testing for signficance.  Note that for some datasets (namely, Los Angeles, San Diego, Oakland, and San Jose), `lat` and `long` are not included.  Luckily, we only need the location in order to calculate the exact sunrise/sunset times, and this can be generalized to each city.  Our function will include functionality to create the necessary `lat` and `long` variables for datasets without such information.
+
+```{r}
+getCityCoords <- function(link) {
+  #Takes a link to data and assigns appropriate lat and lng coordinates.
+  
+  if (grepl('los_angeles', link))
+    return(c(34.052235, -118.243683))
+  
+  if (grepl('san_diego', link))
+    return(c(32.715736, -117.161087))
+  
+  if (grepl('oakland', link))
+    return(c(37.804363, -122.271111))
+  
+  if (grepl('san_jose', link))
+    return(c(37.335480, -121.893028))
+}
+
+getData <- function(link) {
+  #Takes a link to data and configures it as necessary.  Samples n/10000 traffic stops.  Returns a mutated `daytime` variable.
+  
+  set.seed(47)
+  
+  raw <- readRDS(file = url(link))
+  
+  if (! 'lat' %in% colnames(raw)) {
+    raw <- raw %>%
+      mutate(lat = getCityCoords(link)[1]) %>%
+      mutate(lng = getCityCoords(link)[2])
+  }
+
+  clean <- raw %>%
+    select(c(date, time, lat, lng, subject_race)) %>%
+    drop_na() %>%
+    sample_n(nrow(raw)/100)
+  
+  return(mutateClass(clean))
+}
 ```
 
+We now have a function, `getData`, that will effectively scrape all of the necessary datasets and generate the samples and daytime booleans that will be used to conduct our statistical analyses and visualizations.  The following function calls will generate individual datasets for each city.
 
+```
+sf <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds')
+ok <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_oakland_2019_08_13.rds')
+sj <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_jose_2019_08_13.rds')
+bf <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_bakersfield_2019_08_13.rds')
+la <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_los_angeles_2019_08_13.rds')
+sd <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_diego_2019_08_13.rds')
+```
 
+Our final goal is to create one large dataset containing all of the data samples.
 
+```{r}
+parseData <- function(links, city.codes) {
+  #Takes in a list of URLs and city codes and merges the datasets that are scraped from the sources.
+  
+  master.frame <- getData(links[1])
+  master.frame <- master.frame %>% mutate(city = city.codes[1])
+  
+  for (i in 2:length(links)) {
+    data <- getData(links[i])
+    data <- data %>% mutate(city = city.codes[i])
+    master.frame <- full_join(master.frame, data)
+  }
+  
+  return(master.frame)
+}
+```
 
+And, we're done!  Running the following code will generate the dataset that we need:
 
+```
+links <- c('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds',
+           'https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_oakland_2019_08_13.rds',
+           'https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_jose_2019_08_13.rds',
+           'https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_bakersfield_2019_08_13.rds',
+           'https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_los_angeles_2019_08_13.rds',
+           'https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_diego_2019_08_13.rds')
+city.codes <- c('sf', 'ok', 'sj', 'bf', 'la', 'sd')
+
+ca.df <- parseData(links, city.codes)
+```
+
+To save a local copy of this dataframe, run the following code chunk.  A copy has been saved to the repo in the `Data` folder.
+
+```
+save(ca.df, file='cadata.Rda')
+```
 
 
