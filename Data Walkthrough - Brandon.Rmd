@@ -13,12 +13,12 @@ MATH 154
 ## Generating Test Data
 For testing purposes, we will utilize the dataset for San Francisco.  Note that we will have to omit any observations with $NA$ entries for any one of `lat`, `lng`, `date`, `time`, and `subject_race`.
 
-```{r, warning=FALSE, message=FALSE, echo=FALSE}
+```{r, warning=FALSE, message=FALSE}
 library(dplyr)
 library(tidyr)
 ```
 
-```
+```{r eval=FALSE}
 sf <- readRDS(file = url('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds'))
 sf.api <- sf %>%
   select(c(date, time, lat, lng, subject_race)) %>%
@@ -28,7 +28,7 @@ sf.api <- sf %>%
 ## Functions to Classify Times as Day or Night
 First, we'll write a helper function that utilizes `POSIXct`, `hms`, and the data itself in order to first determine the sunrise and sunset times for a given day and coordinates, then return a boolean evaluating to `True` if the observed time was during the day and `False` if it occurred at night.
 
-```{r, warning=FALSE, message=FALSE, echo=FALSE}
+```{r, warning=FALSE, message=FALSE}
 library(StreamMetabolism)
 library(hms)
 ```
@@ -116,7 +116,7 @@ getData <- function(link) {
 
 We now have a function, `getData`, that will effectively scrape all of the necessary datasets and generate the samples and daytime booleans that will be used to conduct our statistical analyses and visualizations.  The following function calls will generate individual datasets for each city.
 
-```
+```{r eval=FALSE}
 sf <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds')
 ok <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_oakland_2019_08_13.rds')
 sj <- getData('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_jose_2019_08_13.rds')
@@ -146,7 +146,7 @@ parseData <- function(links, city.codes) {
 
 And, we're done!  Running the following code will generate the dataset that we need:
 
-```
+```{r eval=FALSE}
 links <- c('https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_francisco_2019_08_13.rds',
            'https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_oakland_2019_08_13.rds',
            'https://stacks.stanford.edu/file/druid:hp256wp2687/hp256wp2687_ca_san_jose_2019_08_13.rds',
@@ -160,8 +160,17 @@ ca.df <- parseData(links, city.codes)
 
 To save a local copy of this dataframe, run the following code chunk.  A copy has been saved to the repo in the `Data` folder.
 
-```
-save(ca.df, file='cadata.Rda')
+```{r eval=FALSE}
+save(ca.df, file='cadata.csv')
 ```
 
+## Some Data Analysis (Section Under Review)
+So, what do we find?  Is there a statistically significant difference between the proportion of stops of members of a certain race during the day versus during the night?  To analyze this, we'll use a $\chi^2$ test.
+
+```{r, eval=FALSE}
+#In General
+chisq.test(ca.df$subject_race, ca.df$daytime)
+```
+
+The answer is yes: With five degrees of freedom, we get a p-value of $p = 2.2 \times 10^{-16}$, indicating that the likelihood in seeing the difference in number of arrests during the day and night by race shown by our data is extraordinarily small under the null (i.e., by chance).
 
