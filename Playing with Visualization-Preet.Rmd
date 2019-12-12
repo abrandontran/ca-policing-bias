@@ -40,12 +40,25 @@ ggplot(ca.df)+
 
 The next area that would be interesting for visualization would be what proportion of arrests for the daytime were non-white as compared to the proportion at night. 
 
+The pie chart 
 ```{r}
 arrests.white.sf <- filter(ca.df, city == "sf", subject_race == "white") %>% 
   group_by(daytime) %>% 
   tally() %>%
-  mutate(proportion = n / sum(n) )
+  mutate(proportion = n / sum(n)  ) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) %>%
+  mutate(lab.ypos = cumsum(proportion) - 0.5*proportion)
 
+ggplot(arrests.white.sf, aes(x = "", y = proportion, fill = daytime))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+  geom_text(aes(y = lab.ypos, label = proportion), color = "white")+
+  theme_void() + labs(title = "Proportion of Daytime VS Nightime Arrests of white-identifying folks in SF")
+  
+```
+The proportion should be the same for black and hispanic drivers.
+
+```{r}
 
 ```
 
