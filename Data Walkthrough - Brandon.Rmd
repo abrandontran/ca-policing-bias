@@ -180,7 +180,7 @@ ca.daytime <- ca.df %>%
   group_by(subject_race) %>%
   summarize(daytime = n())
 
-ca.prop <- data.frame(daytime = ca.daytime$daytime, nig httime = ca.race$total - ca.daytime$daytime, 
+ca.prop <- data.frame(daytime = ca.daytime$daytime, nighttime = ca.race$total - ca.daytime$daytime, 
                       row.names = ca.daytime$subject_race)
 
 chisq.test(ca.prop)
