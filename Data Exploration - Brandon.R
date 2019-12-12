@@ -106,7 +106,3 @@ mutate_class <- function(df) {
 #   classifications.append('test')
 # 
 # return classifications
-
-
-
-
