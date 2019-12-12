@@ -24,21 +24,28 @@ sum.dayvsnight.arrests <- ca.df %>%
 
 ```
 
-The first visualization I want to investigate is a comparison of the number of arrests that happen across various cities in California and observe any noticeable differences in the number across cities and from daylight to nightime hours. As observed below, Los Angeles has a significantly larger number of arrests across the time period December 2009 to June 2018. 
+The first visualization I want to investigate is a comparison of the number of arrests that happen across various cities in California and observe any noticeable differences in the number across cities and from daylight to nightime hours. The size of the count dots indicate the number of arrests. As observed below, Los Angeles has a significantly larger number of arrests across the time period December 2009 to June 2018. 
 
 ```{r}
 ggplot(ca.df)+
   geom_count(aes(x=city, y= daytime), alpha = 0.5, color= "orchid4") + scale_size_area(max_size = 20)+
   labs(x= "City",
         y = "Daylight Hours?",
-       title = "Number of daytime and nightime arrests in major cities in California")+
-  theme(legend.position = "bottom") + scale_fill_discrete(name = "Number of Arrests")
+       title = "Number of daytime and nightime arrests in major cities in California")+ 
+  theme(plot.title = element_text(hjust = 0.5))+  #puts title in the center
+  theme(legend.position = "bottom") + 
+  scale_fill_discrete(name = "Number of Arrests") #supposed to change title of the legend
   
 ```
 
 The next area that would be interesting for visualization would be what proportion of arrests for the daytime were non-white as compared to the proportion at night. 
 
 ```{r}
+arrests.white.sf <- filter(ca.df, city == "sf", subject_race == "white") %>% 
+  group_by(daytime) %>% 
+  tally() %>%
+  mutate(proportion = n / sum(n) )
+
 
 ```
 
