@@ -50,8 +50,9 @@ ggplot(arrests.white.sf, aes(x = "", y = proportion , fill = daytime))+
   geom_bar(width = 1, stat = "identity", color = "white") + 
   coord_polar("y", start = 0)+ 
   theme_minimal() + labs(title = "Stops of white people in San Francisco") +
-  labs(fill = "Time of Day")+
-  scale_fill_discrete(labels = c("Day", "Night"))
+  labs(fill = "Time of Day") +
+  scale_fill_manual(values = c("gold1","dodgerblue4"),
+                    labels = c("Day", "Night"))
   
 ```
 The proportion should be the same for black and hispanic drivers.
@@ -69,7 +70,8 @@ ggplot(arrests.black.sf, aes(x = "", y = proportion, fill = daytime))+
    theme_minimal() + 
   labs(title = "Stops of black people in San Francisco")+
   labs(fill = "Time of Day")+
-  scale_fill_discrete(labels = c("Day", "Night"))
+  scale_fill_manual(values = c("gold1","dodgerblue4"),
+                    labels = c("Day", "Night"))
 ```
 The above visualization can be created for Los Angeles and San Jose data.
 
@@ -86,7 +88,8 @@ ggplot(arrests.white.la, aes(x = "", y = proportion, fill = daytime))+
    theme_minimal() + 
   labs(title = "Stops of white people in LA")+
   labs(fill = "Time of Day")+
-  scale_fill_discrete(labels = c("Day", "Night"))
+  scale_fill_manual(values = c("gold1","dodgerblue4"),
+                    labels = c("Day", "Night"))
 
 arrests.black.la <- filter(ca.df, city == "la", subject_race == "black") %>% 
   group_by(daytime) %>% 
@@ -100,10 +103,112 @@ ggplot(arrests.black.la, aes(x = "", y = proportion, fill = daytime))+
    theme_minimal() + 
   labs(title = "Stops of black people in LA")+
   labs(fill = "Time of Day")+
-  scale_fill_discrete(labels = c("Day", "Night"))
+  scale_fill_manual(values = c("gold1","dodgerblue4"),
+                    labels = c("Day", "Night"))
 ```
 From the pie charts above, we can observe that in even just these two cities, something interesting is going on. Out of the total number of black people stopped, there is a fairly equal distribution from night to day. This means that approximately half the stops were during the day and half at night. However, for both cities, a significantly larger proportion of the total number of white people stopped was at night as compared to the day. If this trend exists across all cities then this means that white people were stopped more often at night than during the day when it was easier to see the driver in the car.
 
 **Further Investigation**
 
-I am now inclined to 
+I am now inclined to investigate that out of ALL day-time stops, what proportion was each race? Was this proportion the same as night time stops?
+ 
+**San Francisco**
+```{r}
+stops.day.sf <- ca.df %>% filter(city == "sf", daytime == "TRUE") %>%
+  group_by(subject_race) %>%
+  tally() %>%
+  mutate(proportion = n/ sum(n)) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(stops.day.sf, aes(x = "", y = proportion, fill = subject_race))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Daytime stops in San Francisco")+
+  labs(fill = "Race")+
+  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                    labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+
+stops.night.sf <- ca.df %>% filter(city == "sf", daytime == "FALSE") %>%
+  group_by(subject_race) %>%
+  tally() %>%
+  mutate(proportion = n/ sum(n)) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(stops.night.sf, aes(x = "", y = n, fill = subject_race))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Nightime stops in San Francisco")+
+  labs(fill = "Race")+
+  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                    labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+```
+**Los Angeles**
+```{r}
+stops.day.la <- ca.df %>% filter(city == "la", daytime == "TRUE") %>%
+  group_by(subject_race) %>%
+  tally() %>%
+  mutate(proportion = n/ sum(n)) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(stops.day.la, aes(x = "", y = proportion, fill = subject_race))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Daytime stops in Los Angeles")+
+  labs(fill = "Race")+
+  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                    labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+
+stops.night.la <- ca.df %>% filter(city == "la", daytime == "FALSE") %>%
+  group_by(subject_race) %>%
+  tally() %>%
+  mutate(proportion = n/ sum(n)) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(stops.night.la, aes(x = "", y = n, fill = subject_race))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Nightime stops in Los Angeles")+
+  labs(fill = "Race")+
+  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                    labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+```
+
+**San Diego**
+
+```{r}
+stops.day.sd <- ca.df %>% filter(city == "sd", daytime == "TRUE") %>%
+  group_by(subject_race) %>%
+  tally() %>%
+  mutate(proportion = n/ sum(n)) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(stops.day.sd, aes(x = "", y = proportion, fill = subject_race))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Daytime stops in San Diego")+
+  labs(fill = "Race")+
+  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                    labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+
+stops.night.sd <- ca.df %>% filter(city == "sd", daytime == "FALSE") %>%
+  group_by(subject_race) %>%
+  tally() %>%
+  mutate(proportion = n/ sum(n)) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(stops.night.sd, aes(x = "", y = n, fill = subject_race))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Nightime stops in San Diego")+
+  labs(fill = "Race")+
+  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                    labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+```
+
+
