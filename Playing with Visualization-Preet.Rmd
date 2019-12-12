@@ -7,3 +7,38 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+
+```
+
+```{r}
+load("cadata.RDA")
+data.daytime <- filter(ca.df, daytime == "TRUE")
+sum.dayvsnight.arrests <- ca.df %>% 
+  group_by(city, daytime)%>% 
+  tally()
+
+
+```
+
+The first visualization I want to investigate is a comparison of the number of arrests that happen across various cities in California and observe any noticeable differences in the number across cities and from daylight to nightime hours. As observed below, Los Angeles has a significantly larger number of arrests across the time period December 2009 to June 2018. 
+
+```{r}
+ggplot(ca.df)+
+  geom_count(aes(x=city, y= daytime), alpha = 0.5, color= "orchid4") + scale_size_area(max_size = 20)+
+  labs(x= "City",
+        y = "Daylight Hours?",
+       title = "Number of daytime and nightime arrests in major cities in California")+
+  theme(legend.position = "bottom") + scale_fill_discrete(name = "Number of Arrests")
+  
+```
+
+The next area that would be interesting for visualization would be what proportion of arrests for the daytime were non-white as compared to the proportion at night. 
+
+```{r}
+
+```
+
