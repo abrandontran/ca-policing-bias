@@ -47,9 +47,11 @@ arrests.white.sf <- filter(ca.df, city == "sf", subject_race == "white") %>%
   mutate_at(vars(proportion), funs(round(., 3)))
 
 ggplot(arrests.white.sf, aes(x = "", y = proportion , fill = daytime))+
-  geom_bar(width = 1, stat = "identity", color = "white") +
-  coord_polar("y", start = 0)+
-  theme_void() + labs(title = "Proportion of Daytime VS Nightime Arrests of white-identifying folks in SF")
+  geom_bar(width = 1, stat = "identity", color = "white") + 
+  coord_polar("y", start = 0)+ 
+  theme_minimal() + labs(title = "Stops of white people in San Francisco") +
+  labs(fill = "Time of Day")+
+  scale_fill_discrete(labels = c("Day", "Night"))
   
 ```
 The proportion should be the same for black and hispanic drivers.
@@ -64,6 +66,44 @@ arrests.black.sf <- filter(ca.df, city == "sf", subject_race == "black") %>%
 ggplot(arrests.black.sf, aes(x = "", y = proportion, fill = daytime))+
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar("y", start = 0)+
-  theme_void() + labs(title = "Proportion of Daytime VS Nightime Arrests of black-identifying folks in SF")
+   theme_minimal() + 
+  labs(title = "Stops of black people in San Francisco")+
+  labs(fill = "Time of Day")+
+  scale_fill_discrete(labels = c("Day", "Night"))
 ```
+The above visualization can be created for Los Angeles and San Jose data.
 
+```{r}
+arrests.white.la <- filter(ca.df, city == "la", subject_race == "white") %>% 
+  group_by(daytime) %>% 
+  tally() %>%
+  mutate(proportion = n / sum(n)  ) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(arrests.white.la, aes(x = "", y = proportion, fill = daytime))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Stops of white people in LA")+
+  labs(fill = "Time of Day")+
+  scale_fill_discrete(labels = c("Day", "Night"))
+
+arrests.black.la <- filter(ca.df, city == "la", subject_race == "black") %>% 
+  group_by(daytime) %>% 
+  tally() %>%
+  mutate(proportion = n / sum(n)  ) %>%
+  mutate_at(vars(proportion), funs(round(., 3))) 
+
+ggplot(arrests.black.la, aes(x = "", y = proportion, fill = daytime))+
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+   theme_minimal() + 
+  labs(title = "Stops of black people in LA")+
+  labs(fill = "Time of Day")+
+  scale_fill_discrete(labels = c("Day", "Night"))
+```
+From the pie charts above, we can observe that in even just these two cities, something interesting is going on. Out of the total number of black people stopped, there is a fairly equal distribution from night to day. This means that approximately half the stops were during the day and half at night. However, for both cities, a significantly larger proportion of the total number of white people stopped was at night as compared to the day. If this trend exists across all cities then this means that white people were stopped more often at night than during the day when it was easier to see the driver in the car.
+
+**Further Investigation**
+
+I am now inclined to 
