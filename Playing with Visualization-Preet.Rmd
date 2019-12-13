@@ -162,7 +162,7 @@ day.plot <- ggplot(stops.day.sf, aes(x = "", y = proportion, fill = subject_race
    theme_minimal() + 
   labs(title = "Daytime stops in San Francisco")+
   labs(fill = "Race")+
-  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+  scale_fill_manual(values = c("deepskyblue2","dodgerblue4", "skyblue1", "skyblue3", "cadetblue1"),
                     labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
 
 stops.night.sf <- ca.df %>% filter(city == "sf", daytime == "FALSE") %>%
@@ -177,7 +177,7 @@ night.plot <- ggplot(stops.night.sf, aes(x = "", y = proportion, fill = subject_
    theme_minimal() + 
   labs(title = "Nightime stops in San Francisco")+
   labs(fill = "Race")+
-  scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+  scale_fill_manual(values = c("deepskyblue2","dodgerblue4", "skyblue1", "skyblue3", "cadetblue1"),
                     labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
 
 plot_grid(day.plot, night.plot)
