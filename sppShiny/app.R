@@ -18,7 +18,8 @@ ui <- fluidPage(
   titlePanel("In the Dark: Exploring Racial Disparities in Traffic Stops Before and After Sunset"),
 
   sidebarLayout(
-    sidebarPanel(selectInput("choose_city", "Choose City", choices = c("sf", "ok", "sj", "bf", "la", "sd"))),
+    sidebarPanel(selectInput("choose_city", "Choose City", choices = c("San Francisco", "Oakland", "San Jose", "Bakersfield", 
+                                                                       "Los Angeles", "San Diego"))),
     mainPanel(
       plotOutput("daypie")))
 
@@ -35,7 +36,15 @@ server <- function(input, output) {
   
   output$daypie <- renderPlot({
     
-    stops.day <- ca.df %>% filter(city == input$choose_city, daytime == "TRUE") %>%
+    select_city <- switch (input$choose_city,
+      "San Francisco" = "sf",
+      "Oakland" = "ok",
+      "Los Angeles" = "la",
+      "San Jose" = "sj",
+      "San Diego" = "sd",
+      "Bakersfield" = "bf")
+    
+    stops.day <- ca.df %>% filter(city == select_city, daytime == "TRUE") %>%
       group_by(subject_race) %>%
       tally() %>%
       mutate(proportion = n/ sum(n)) %>%
