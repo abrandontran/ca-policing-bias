@@ -35,34 +35,23 @@ server <- function(input, output) {
   
   output$piechart <- renderPlot({
     
-    stops.day.sf <- ca.df %>% filter(city == "sf", daytime == "TRUE") %>%
+    stops.day <- ca.df %>% filter(city == "sf", daytime == "TRUE") %>%
       group_by(subject_race) %>%
       tally() %>%
       mutate(proportion = n/ sum(n)) %>%
       mutate_at(vars(proportion), funs(round(., 3))) 
     
-    stops.day.la <- ca.df %>% filter(city == "la", daytime == "TRUE") %>%
-      group_by(subject_race) %>%
-      tally() %>%
-      mutate(proportion = n/ sum(n)) %>%
-      mutate_at(vars(proportion), funs(round(., 3))) 
-    
-    data <- switch(input$choose_city, 
-                   "sf" = stops.day.sf,
-                   "la" = stops.day.la,
-                   "sd" = stops.day.sd,
-                   "sj" = stops.day.sj,
-                   "bf" = stops.day.bf,
-                   "ok" = stops.day.ok)
-    
-    ggplot(data)+
-      geom_bar(aes(x = "", y = proportion, fill = subject_race), width = 1, stat = "identity", color = "white") +
+    ggplot(stops.day, aes(x = "", y = proportion, fill = as.character(subject_race)))+
+      geom_bar(width = 1, stat = "identity", color = "white") +
       coord_polar("y", start = 0)+
       theme_minimal() + 
-      labs(title = "Daytime Stops by Race")+
+      labs(title = "Daytime stops in San Francisco")+
       labs(fill = "Race")+
       scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
                         labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+   
+
+    
   })
   
   }
