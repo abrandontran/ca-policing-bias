@@ -19,7 +19,8 @@ ui <- fluidPage(
 
   sidebarLayout(
     sidebarPanel(selectInput("choose_city", "Choose City", choices = c("sf", "ok", "sj", "bf", "la", "sd"))),
-    mainPanel(plotOutput("piechart")))
+    mainPanel(
+      plotOutput("daypie")))
 
 
 ) #end of Ui
@@ -32,7 +33,7 @@ ui <- fluidPage(
 # Define server logic ----
 server <- function(input, output) {
   
-  output$piechart <- renderPlot({
+  output$daypie <- renderPlot({
     
     stops.day <- ca.df %>% filter(city == input$choose_city, daytime == "TRUE") %>%
       group_by(subject_race) %>%
@@ -44,14 +45,14 @@ server <- function(input, output) {
       geom_bar(width = 1, stat = "identity", color = "white") +
       coord_polar("y", start = 0)+
       theme_minimal() + 
-      labs(title = "Daytime stops in San Francisco")+
+      labs(title = "Daytime stops: Racial break-up")+
       labs(fill = "Race")+
       scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
                         labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
    
-
-    
+   
   })
+  
   
   }
 
