@@ -9,6 +9,7 @@ library(leaflet)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
+library(cowplot)
 
   #Generating data sets here
 
@@ -50,7 +51,7 @@ server <- function(input, output) {
       mutate(proportion = n/ sum(n)) %>%
       mutate_at(vars(proportion), funs(round(., 3))) 
     
-    ggplot(stops.day, aes(x = "", y = proportion, fill = as.character(subject_race)))+
+    day.plot <- ggplot(stops.day, aes(x = "", y = proportion, fill = as.character(subject_race)))+
       geom_bar(width = 1, stat = "identity", color = "white") +
       coord_polar("y", start = 0)+
       theme_minimal() + 
@@ -59,6 +60,22 @@ server <- function(input, output) {
       scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
                         labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
    
+    stops.night <- ca.df %>% filter(city == select_city, daytime == "FALSE") %>%
+      group_by(subject_race) %>%
+      tally() %>%
+      mutate(proportion = n/ sum(n)) %>%
+      mutate_at(vars(proportion), funs(round(., 3))) 
+    
+    night.plot <- ggplot(stops.night, aes(x = "", y = proportion, fill = subject_race))+
+      geom_bar(width = 1, stat = "identity", color = "white") +
+      coord_polar("y", start = 0)+
+      theme_minimal() + 
+      labs(title = "Nightime stops in San Francisco")+
+      labs(fill = "Race")+
+      scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                        labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
+    
+    plot_grid(day.plot, night.plot)
    
   })
   
