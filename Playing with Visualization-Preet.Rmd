@@ -244,11 +244,12 @@ ggplot(stops.night.sd, aes(x = "", y = proportion, fill = subject_race))+
                     labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
 ```
 
-```{r}
-library(maps)
-library(mapproj)
-source("Data/helpers.R")
-counties <- readRDS("Data/counties.rds")
-percent_map(counties$white, "darkgreen", "% White")
-```
+#```{r}
+#library(maps)
+#library(mapproj)
+#source("Data/helpers.R")
+#counties<- readRDS("Data/counties.rds") 
+#counties.ca <- slice(counties, 157:214)
+#percent_map(counties.ca$white, "navyblue", "% White")
+#```
 

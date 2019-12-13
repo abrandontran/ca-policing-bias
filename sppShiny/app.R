@@ -7,42 +7,66 @@
 library(shiny)
 library(leaflet)
 library(ggplot2)
+library(dplyr)
+library(tidyverse)
+
+  #Generating data sets here
+
 
 # Define UI ----
 ui <- fluidPage(
-  titlePanel("Traffic Stops in Californian Cities"),
-  mainPanel( 
-    #this will create a space for us to display our map
-    leafletOutput(outputId = "mymap"), 
-    #this allows me to put the checkmarks ontop of the map to allow people to view earthquake depth or overlay a heatmap
-    absolutePanel(top = 60, left = 20, 
-                  checkboxInput("markers", "Depth", FALSE),
-                  checkboxInput("heat", "Heatmap", FALSE)
-    )
-  ))
-
+  titlePanel("In the Dark: Exploring Racial Disparities in Traffic Stops Before and After Sunset"),
+  
+  sidebarLayout(
+    sidebarPanel(selectInput("choose_city", label = h5("Choose City"),  #the choose city widget
+                              choices = list("sf" = 1, "la" = 2,
+                                "sd" = 3, "bf" = 4, "sj" = 5, "ok" = 6), selected = 1)
+      
+               ),
+    mainPanel( plotOutput("piechart")
+              )
+  )
+  
+  
+) #end of Ui
 
 # Define server logic ----
-server <- function(input, output, session) {
+server <- function(input, output) {
   
-  
-  output$mymap <- renderLeaflet({
-    leaflet(data) %>%
-      addPolygons(
-        label=~label, labelOptions = labelOptions(),
-        popup=~popup, popupOptions = popupOptions(),
-        # Shape Options
-        options = pathOptions(),
-        weight = 1, opacity=0.8, color = "#000000",
-        fillColor="#ff0000", fillOpacity=0.7,
-        # Highlighting on mouse-over
-        highlightOptions = highlightOptions(
-          color='#00ff00', weight = 2,
-          opacity = 1, fillOpacity = 1,
-          bringToFront = TRUE, sendToBack = TRUE),
-        group = 'Group-A')
+  output$piechart <- renderPlot({
+    
+    stops.day.sf <- ca.df %>% filter(city == "sf", daytime == "TRUE") %>%
+      group_by(subject_race) %>%
+      tally() %>%
+      mutate(proportion = n/ sum(n)) %>%
+      mutate_at(vars(proportion), funs(round(., 3))) 
+    
+    stops.day.la <- ca.df %>% filter(city == "la", daytime == "TRUE") %>%
+      group_by(subject_race) %>%
+      tally() %>%
+      mutate(proportion = n/ sum(n)) %>%
+      mutate_at(vars(proportion), funs(round(., 3))) 
+    
+    data <- switch(input$choose_city, 
+                   "sf" = stops.day.sf,
+                   "la" = stops.day.la,
+                   "sd" = stops.day.sd,
+                   "sj" = stops.day.sj,
+                   "bf" = stops.day.bf,
+                   "ok" = stops.day.ok)
+    
+    ggplot(data)+
+      geom_bar(aes(x = "", y = proportion, fill = subject_race), width = 1, stat = "identity", color = "white") +
+      coord_polar("y", start = 0)+
+      theme_minimal() + 
+      labs(title = "Daytime Stops by Race")+
+      labs(fill = "Race")+
+      scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
+                        labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
   })
-}
+  
+  }
+
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
