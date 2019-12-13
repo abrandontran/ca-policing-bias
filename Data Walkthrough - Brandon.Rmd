@@ -108,7 +108,7 @@ getData <- function(link) {
   clean <- raw %>%
     select(c(date, time, lat, lng, subject_race)) %>%
     drop_na() %>%
-    sample_n(nrow(raw)/100)
+    sample_n(nrow(raw)/10)
   
   return(mutateClass(clean))
 }
@@ -171,6 +171,7 @@ So, what do we find?  Is there a statistically significant difference between th
 #In General
 chisq.test(ca.df$subject_race, ca.df$daytime)
 
+#Local Inference
 ca.race <- ca.df %>%
   group_by(subject_race) %>%
   summarize(total = n())
@@ -180,14 +181,21 @@ ca.daytime <- ca.df %>%
   group_by(subject_race) %>%
   summarize(daytime = n())
 
-ca.prop <- data.frame(daytime = ca.daytime$daytime, nighttime = ca.race$total - ca.daytime$daytime, 
+ca.totals <- data.frame(daytime = ca.daytime$daytime, nighttime = ca.race$total - ca.daytime$daytime, 
                       row.names = ca.daytime$subject_race)
-
-chisq.test(ca.prop)
 ```
 
-The answer is yes: With five degrees of freedom, we get a p-value of $p = 2.2 \times 10^{-16}$, indicating that the likelihood in seeing the difference in number of arrests during the day and night by race shown by our data is extraordinarily small under the null (i.e., by chance).
+The answer is yes: With five degrees of freedom, we get a p-value of $p = 2.2 \times 10^{-16}$, suggesting that race and time of stop are not independent of each other.  However, via local inference under multiple testing considerations (including the utilization of Bonferroni's inequality), we find that contrary to our expectation, the disparity between daytime and nighttime arrests is really only significant when the violator is white.
 
+
+## Official Blurb on Statistical Analysis
+We performed a $\chi^{2}$ test for Independence in order to evaluate the null hypothesis: that `race` and `time of arrest` are independent of each other, where `time of arrest` refers to whether or not a stop is before or after sunset.  With $5$ degrees of freedom, the test yielded a $p$-value of $p = 2.2 \times 10^{-16}$, which is less than $\alpha = .05$, thus allowing us to reject the null and conlcude that the two variables are, in fact, dependent.
+
+In more colloquial terms, we disproved the assumption that knowing what time of day it is has no effect on one's guess of the race of a random driver.  Rather, a relationship does, in fact, exist here: If given the time of day, we should guess a certain race moreso than the others when considering a random driver.
+
+Which race, specifically, should we guess?  Unforunately, our test does not tell us this, but some local analysis will allow us to test some of our predispositions.  Specifically, we will test `white` against `Asian/Pacific Islander`, `Black`, and `Hispanic`.  For the sake of technicality: Under Bonferroni's Inequality, we need the sum of our $p$-values to be less than $\alpha = .05$ for significance.  When comparing each of the above races against `white`, we gain small $p$-values that sum to less than $\alpha = .05$, suggesting that the distribution of `white` traffic stops differs from the rest.
+
+Visualizations will aid in the interpretation of these results.
 
 
 
