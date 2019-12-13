@@ -13,29 +13,28 @@ library(tidyverse)
   #Generating data sets here
 
 
-# Define UI ----
+#Define UI ----
 ui <- fluidPage(
   titlePanel("In the Dark: Exploring Racial Disparities in Traffic Stops Before and After Sunset"),
-  
+
   sidebarLayout(
-    sidebarPanel(selectInput("choose_city", label = h5("Choose City"),  #the choose city widget
-                              choices = list("sf" = 1, "la" = 2,
-                                "sd" = 3, "bf" = 4, "sj" = 5, "ok" = 6), selected = 1)
-      
-               ),
-    mainPanel( plotOutput("piechart")
-              )
-  )
-  
-  
+    sidebarPanel(selectInput("choose_city", "Choose City", choices = c("sf", "ok", "sj", "bf", "la", "sd"))),
+    mainPanel(plotOutput("piechart")))
+
+
 ) #end of Ui
+
+# ui <- fluidPage(
+#   selectInput("choose_city", "Choose City", choices = c("sf", "ok", "sj", "bf", "la", "sd")),
+#   plotOutput("piechart")
+# )
 
 # Define server logic ----
 server <- function(input, output) {
   
   output$piechart <- renderPlot({
     
-    stops.day <- ca.df %>% filter(city == "sf", daytime == "TRUE") %>%
+    stops.day <- ca.df %>% filter(city == input$choose_city, daytime == "TRUE") %>%
       group_by(subject_race) %>%
       tally() %>%
       mutate(proportion = n/ sum(n)) %>%
