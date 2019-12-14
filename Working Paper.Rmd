@@ -1,9 +1,6 @@
 ---
-title: "In the Dark:"
-subtitle: "Exploring Racial Disparities in Traffic Stops Before and After Sunset"
-author:
-  - "Brandon Tran - Pomona College `21"
-  - "Preet Khowaja - Pomona College `20"
+title: "In the Dark: Exploring Racial Disparities in Traffic Stops Before and After Sunset"
+subtitle: "Brandon Tran '21, Pomona College, Claremont, CA  \n Preet Khowaja '20, Pomona College, Claremont, CA"
 date: "December 2019"
 output: pdf_document
 ---
@@ -12,22 +9,16 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Motivation (Preet)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# The Data (Brandon)
+Include information about ethical sourcing of data.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Statistical Findings (Brandon)
 
-```{r cars}
-summary(cars)
-```
+# Visualizations (Preet)
 
-## Including Plots
+# Limitations (Brandon)
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Conclusion (Preet)
+Include something about what we learned outside of what was covered in class.
