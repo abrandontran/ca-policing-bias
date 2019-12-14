@@ -26,7 +26,7 @@ sf.api <- sf %>%
 ```
 
 ## Functions to Classify Times as Day or Night
-First, we'll write a helper function that utilizes `POSIXct`, `hms`, and the data itself in order to first determine the sunrise and sunset times for a given day and coordinates, then return a boolean evaluating to `True` if the observed time was during the day and `False` if it occurred at night.
+First, we'll write a few helper functions that utilize `POSIXct`, `hms`, and the data itself in order to first determine the sunrise and sunset times for a given day and coordinates, then return a boolean evaluating to `True` if the observed time was during the day and `False` if it occurred at night.
 
 ```{r, warning=FALSE, message=FALSE}
 library(StreamMetabolism)
@@ -34,7 +34,7 @@ library(hms)
 ```
 
 ```{r}
-classify <- function(lat, long, date, time) {
+get_time <- function(lat, long, date) {
   #Takes lat, long, time, and date as input and classifies TRUE if the time is at day and FALSE if at night.
   
   sunrise <- sunrise.set(lat, long, date)$sunrise
@@ -44,8 +44,16 @@ classify <- function(lat, long, date, time) {
   sunset <- sunrise.set(lat, long, date)$sunset
   attributes(sunset)$tzone <- 'America/Los_Angeles'
   sunset <- as_hms(sunset)
+  
+  return(c(sunrise, sunset))
+}
+```
 
-  if (time < sunset && time >= sunrise)
+```{r}
+classify <- function(rise.set, time) {
+  #Takes in a vector with sunrise and sunset times, returning True if the time is during daylight.
+  
+  if (time < rise.set[2] && time >= rise.set[1])
     return(TRUE)
   
   else
@@ -60,13 +68,17 @@ mutateClass <- function(df) {
   #Takes a dataframe and adds the boolean day/night classification found via `classify` as a new column.
   
   classifications <- c()
+  timetoset <- c()
   
   for (i in 1:nrow(df)) {
-    classifications[i] <- classify(df$lat[i], df$lng[i], df$date[i], df$time[i])
+    time <- get_time(df$lat[i], df$lng[i], df$date[i])
+    timetoset[i] <- (time[2] - df$time[i])/60
+    classifications[i] <- classify(time, df$time[i])
   }
   
   df <- df %>%
-    mutate(daytime = classifications)
+    mutate(daytime = classifications) %>%
+    mutate(minsto.set = timetoset)
 }
 ```
 
@@ -108,7 +120,7 @@ getData <- function(link) {
   clean <- raw %>%
     select(c(date, time, lat, lng, subject_race)) %>%
     drop_na() %>%
-    sample_n(nrow(raw)/10)
+    sample_n(nrow(raw)/1000)
   
   return(mutateClass(clean))
 }
