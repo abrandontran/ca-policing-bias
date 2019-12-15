@@ -47,9 +47,7 @@ get_time <- function(lat, long, date) {
   
   return(c(sunrise, sunset))
 }
-```
 
-```{r}
 classify <- function(rise.set, time) {
   #Takes in a vector with sunrise and sunset times, returning True if the time is during daylight.
   
@@ -120,7 +118,7 @@ getData <- function(link) {
   clean <- raw %>%
     select(c(date, time, lat, lng, subject_race)) %>%
     drop_na() %>%
-    sample_n(nrow(raw)/1000)
+    sample_n(nrow(raw)/100)
   
   return(mutateClass(clean))
 }
@@ -183,18 +181,23 @@ So, what do we find?  Is there a statistically significant difference between th
 #In General
 chisq.test(ca.df$subject_race, ca.df$daytime)
 
-#Local Inference
-ca.race <- ca.df %>%
-  group_by(subject_race) %>%
-  summarize(total = n())
+#Local Inference for API
+ca.api <- ca.df %>%
+  filter(subject_race == "asian/pacific islander" | subject_race == "white")
 
-ca.daytime <- ca.df %>%
-  filter(daytime == TRUE) %>%
-  group_by(subject_race) %>%
-  summarize(daytime = n())
+chisq.test(ca.api$subject_race, ca.api$daytime)
 
-ca.totals <- data.frame(daytime = ca.daytime$daytime, nighttime = ca.race$total - ca.daytime$daytime, 
-                      row.names = ca.daytime$subject_race)
+#Local Inference for Black
+ca.black <- ca.df %>%
+  filter(subject_race == "black" | subject_race == "white")
+
+chisq.test(ca.black$subject_race, ca.black$daytime)
+
+#Local Inference for Hispanic
+ca.hisp <- ca.df %>%
+  filter(subject_race == "hispanic" | subject_race == "white")
+
+chisq.test(ca.hisp$subject_race, ca.hisp$daytime)
 ```
 
 The answer is yes: With five degrees of freedom, we get a p-value of $p = 2.2 \times 10^{-16}$, suggesting that race and time of stop are not independent of each other.  However, via local inference under multiple testing considerations (including the utilization of Bonferroni's inequality), we find that contrary to our expectation, the disparity between daytime and nighttime arrests is really only significant when the violator is white.
