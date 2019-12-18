@@ -249,13 +249,24 @@ ggplot(stops.night.sd, aes(x = "", y = proportion, fill = subject_race))+
   scale_fill_manual(values = c("deepskyblue3","deeppink3", "olivedrab3", "darkorange2", "firebrick3"),
                     labels = c("asian/pacific islander", "black", "hispanic", "white", "other"))
 ```
+```{r}
+library(cowplot)
 
-#```{r}
-#library(maps)
-#library(mapproj)
-#source("Data/helpers.R")
-#counties<- readRDS("Data/counties.rds") 
-#counties.ca <- slice(counties, 157:214)
-#percent_map(counties.ca$white, "navyblue", "% White")
-#```
+stops.day.hist <- cadataupdated %>% filter(city == input$choose_city, daytime == "TRUE") %>%
+        filter(minsto.set < input$before_sunset) %>%
+        group_by(subject_race) %>%
+        tally() %>%
+        mutate(proportion = n/ sum(n)) %>%
+        mutate_at(vars(proportion), funs(round(., 3))) 
+      
+      day.plot.hist <- ggplot(stops.day.hist, aes(x = subject_race, y= proportion))+
+        geom_bar(stat = "identity", , fill = "steelblue4")+ theme_minimal()+
+        ggtitle("Daytime Stops")+ xlab("Race") + ylab("Proportion of total stops")
+      
+      day.plot.hist
+
+
+
+```
+
 

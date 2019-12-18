@@ -9,7 +9,22 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(cowplot)
+```
+
 # 1 | Introduction & Motivation (Preet)
+Investigating racial bias statistically is a fascinating endeavour. It is what motivated us to pick up the Stanford Open Policing Project and apply the analytical tools used in it to six major cities in California. Bias and racial bias, in specific, are psychological and difficult to find in terms of direct causation. However, the challenge of using statistical tools, which are very concrete, to find evidence for racial bias, difficult to read through numbers, is what made this project very interesting for us. 
+
+Racial bias in lawkeeping bodies has been covered by the media in vast detail. It is in many extreme cases of police brutality that these are brought to light. Traffic stops, on the other hand, could be seemingly mild police interactions but are where the American public interacts with the police the most. Over 20 million Americans are pulled over by the police in a year. This means that this specific instance of interaction must be documented and analyzed. 
+
+The method we decided to use for our work was also adopted from the Stanford Computational Policy Lab. It was originally devised in 2006 by Jeffrey Grogger and Greg Ridgeway. The test assumes that the race of drivers cannot be observed at night and so all stops are free from racial bias. A lack of bias during the day should reveal similar proportions of stops by race. The paper released by the Stanford team investigated for racial bias in Texas and discovered statistically significant differences in the rate that black folks were stopped by the police during the day and at night. The same was true for white drivers who were stopped at a higher rate at night than during the day. 
+
+We decided to use the same metric for San Francisco, San Jose, San Diego, Los Angeles, Bakersfield and Oakland. However, the Stanford project used only a small time frame in their Texas example. This time frame was 60 minutes before sunset began to 60 minutes after sunset was complete. It was interesting to us to investigate why they chose this specific time frame as compared to a day/night split. The reason could likely be the elimination of 'noise' from the data if it included the entire day. Examples of the noise they were trying to avoid could be the percentage of drivers on the road who are white and colored and how that changes throughout the day. 
+
 
 # 2 | The Data (Brandon)
 In order to address our question in the context of California, it was necessary to acquire data that contained police records of traffic stops conducted throughout the past decade that included information on the time and location of stop, as well as the race of the driver who was stopped.  Fortunately, The Stanford Open Policing Project hosts an public amalgamation of such records for forty-one US states, and since the published records were collected from government-hosted sources that are open to the public, we faced no ethical issues in terms of utilizing the data.
@@ -57,15 +72,32 @@ The code for the requisite $\chi^{2}$ tests can be found in \textbf{Appendix B} 
 
 Visualizations will aid in the interpretation of these results.
 
-# 4 | Visualizations (Preet)
+# 4 | Visualizations and Demonstration (Preet)
+
+The visual aids we thought necessary to see changing rates were pie charts and histograms. We demonstrated this finished work on an interactive Shiny Applet that allows users to change the time frame from 30 minutes before and after sunset to 600 minutes (10 hours) before and after sunset. By doing this, we wished to see if there were changes in day and night rates depending on the time frame we selected. We observed no such trends in the cities we were looking at. 
+
+R's `ggplot2` package was great to create the visual aid we wanted to use on our Shiny App. I have included some of the visual conclusions here. 
+
+When we observed histograms of changing proportions by limiting the time frame, we noticed no major changes. See Figure 1 and 2 at the end.
+
+The results show that adjusting the time frame does not give us satisfactory results. In fact, the difference in the day/night proportions of white driver stops are is much greater for a larger time frame. 
+
+However, in a different kind of visualization, we do observe evidence of biased stops. Below, I created pie charts (see Figure 3) where the whole represents all stops for a race. Then, I split the chart by how many of the stops were during the day and how many were at night. While the pie charts below are for LA, charts for 4 other cities looked similar. The similarity lied in how of all white people stops, a much smaller proportion was during the day as compared to day proportions for black people. For coloured folks, the split was more even. This suggests that there is evidence that white drivers may be let off more easily than other races during the day.
 
 # 5 | Limitations (Brandon & Preet)
 From a statistical standpoint, we cannot generally say any more than the fact that a driver's race is \textbf{not} independent of whether or not a traffic stop is conducted during the daytime or nighttime.  However, local analysis reveals that this independence is individually seen between each non-white race and white stops; that is, there is some indication that the disparity between daytime and nighttime stops for white drivers is different from that of every other race.
 
 Visualizations suggest that the difference detected by the $\chi^{2}$ tests is that white drivers are stopped more often during the day than at night, whereas for non-white drivers, an approximately equal number of stops are conducted during the day and night.  While this does not allow us to statistically conclude that police bias exists, or even that white drivers are stopped more often during the day than at night, it suggests that these assertions are true.
 
+There are limitations to the visual elements too. Proportions don't account for other factors that could be determining the racial split or the day/night split of stops. These factors could include, for example, what proportion of drivers on the road are white, black and hispanic or the likelihood that drivers at night tend to be more often people of color. 
+
+The veil of darkness test itself has many limitations including the fact that it assumes that there is no way of knowing a driver's race at night. This excludes instances of well-lit places and inside lights of the vehicle being switched on. 
+
 # 6 | Conclusion (Preet)
-Include something about what we learned outside of what was covered in class.
+
+The results of our statistical analysis and visualization work was different from what we expected. We expected to see our results in a clearer way and often it was a challenge to direction our findings. However, with data wrangling and visualization it is essential to know what you want as an output. The challenge of working with a dataset to find trends and patterns was a fascinating one and we were not entirely unsuccessful in finding statistical and visual elements that could be used as evidence to show racial bias. However, the limitations of our analysis became much clearer and apparent as we were finishing up this project and began thinking about our takeaways from it. 
+
+My favourite part of the project was learning how to use Shiny and making decision on how to show information in the best possible visual manner. This is something I wish to work on further with regards to future projects as well. 
 
 \newpage
 # Works Cited
@@ -212,4 +244,117 @@ ca.hisp <- ca.df %>%
   filter(subject_race == "hispanic" | subject_race == "white")
 
 chisq.test(ca.hisp$subject_race, ca.hisp$daytime)
+```
+\newpage
+
+**Figure 1: for 10 hours before and after sunset in LA **
+```{r}
+cadataupdated <- read_csv("Data/cadataupdated.csv")
+
+stops.day <- cadataupdated %>% filter(city == "la", daytime == "TRUE") %>%
+      filter(minsto.set < 600) %>%
+      group_by(subject_race) %>%
+      tally() %>%
+      mutate(proportion = n/ sum(n)) %>%
+      mutate_at(vars(proportion), funs(round(., 3))) 
+    
+    day.hist <- ggplot(stops.day, aes(x = subject_race, y= proportion))+
+        geom_bar(stat = "identity", , fill = "steelblue4")+ theme_minimal()+
+        ggtitle("Daytime Stops")+ xlab("Race") + ylab("Proportion of total stops")+
+      theme(axis.text.x=element_text(angle=50, size=9, vjust=0.5))
+      
+    
+  stops.night <- cadataupdated %>% filter(city == "la", daytime == "FALSE") %>%
+      filter(minsto.set < 600) %>%
+      group_by(subject_race) %>%
+      tally() %>%
+      mutate(proportion = n/ sum(n)) %>%
+      mutate_at(vars(proportion), funs(round(., 3))) 
+    
+   night.hist <- ggplot(stops.night, aes(x = subject_race, y= proportion))+
+       geom_bar(stat = "identity", , fill = "steelblue4")+ theme_minimal()+
+       ggtitle("Nightime Stops")+ xlab("Race") + ylab("Proportion of total stops")+
+     theme(axis.text.x=element_text(angle=50, size=9, vjust=0.5))
+
+    
+    plot_grid(day.hist, night.hist)
+    
+```
+
+**Figure 2: for 60 minutes before and after sunset in LA**
+```{r}
+stops.day.small <- cadataupdated %>% filter(city == "la", daytime == "TRUE") %>%
+      filter(minsto.set < 60) %>%
+      group_by(subject_race) %>%
+      tally() %>%
+      mutate(proportion = n/ sum(n)) %>%
+      mutate_at(vars(proportion), funs(round(., 3))) 
+    
+    day.hist <- ggplot(stops.day.small, aes(x = subject_race, y= proportion))+
+        geom_bar(stat = "identity", , fill = "steelblue4")+ theme_minimal()+
+        ggtitle("Daytime Stops")+ xlab("Race") + ylab("Proportion of total stops")+
+      theme(axis.text.x=element_text(angle=50, size=9, vjust=0.5))
+      
+    
+  stops.night.small <- cadataupdated %>% filter(city == "la", daytime == "FALSE") %>%
+      filter(minsto.set < 60) %>%
+      group_by(subject_race) %>%
+      tally() %>%
+      mutate(proportion = n/ sum(n)) %>%
+      mutate_at(vars(proportion), funs(round(., 3))) 
+    
+   night.hist <- ggplot(stops.night.small, aes(x = subject_race, y= proportion))+
+       geom_bar(stat = "identity", , fill = "steelblue4")+ theme_minimal()+
+       ggtitle("Nightime Stops")+ xlab("Race") + ylab("Proportion of total stops")+
+     theme(axis.text.x=element_text(angle=50, size=9, vjust=0.5))
+
+    
+    plot_grid(day.hist, night.hist)
+    
+```
+
+**Figure 3: Day/Night Split of total stops of white, black and hispanic drivers in LA**
+```{r}
+stops.white <- filter(cadataupdated, city == "la", subject_race == "white") %>% 
+       group_by(daytime) %>% 
+       tally() %>%
+       mutate(proportion = n / sum(n)  ) %>%
+       mutate_at(vars(proportion), funs(round(., 3)))
+     
+plot.white <- ggplot(stops.white, aes(x = "", y = proportion , fill = daytime))+
+       geom_bar(width = 1, stat = "identity", color = "white") + 
+       coord_polar("y", start = 0)+ 
+       theme_minimal() + labs(title = "White folks stopped" ) +
+       labs(fill = "Time of Day") +
+       scale_fill_manual(values = c("gold1","dodgerblue4"),
+                         labels = c("Day", "Night"))
+     
+stops.black <- filter(cadataupdated, city == "la", subject_race == "black") %>% 
+       group_by(daytime) %>% 
+       tally() %>%
+       mutate(proportion = n / sum(n)  ) %>%
+       mutate_at(vars(proportion), funs(round(., 3)))
+     
+plot.black <- ggplot(stops.black, aes(x = "", y = proportion , fill = daytime))+
+       geom_bar(width = 1, stat = "identity", color = "white") + 
+       coord_polar("y", start = 0)+ 
+       theme_minimal() + labs(title = "Black folks stopped" ) +
+       labs(fill = "Time of Day") +
+       scale_fill_manual(values = c("gold1","dodgerblue4"),
+                         labels = c("Day", "Night"))
+     
+stops.hispanic <- filter(cadataupdated, city == "la", subject_race == "hispanic") %>% 
+       group_by(daytime) %>% 
+       tally() %>%
+       mutate(proportion = n / sum(n)  ) %>%
+       mutate_at(vars(proportion), funs(round(., 3)))
+     
+plot.hispanic <- ggplot(stops.hispanic, aes(x = "", y = proportion , fill = daytime))+
+       geom_bar(width = 1, stat = "identity", color = "white") + 
+       coord_polar("y", start = 0)+ 
+       theme_minimal() + labs(title = "Hispanic folks stopped" ) +
+       labs(fill = "Time of Day") +
+       scale_fill_manual(values = c("gold1","dodgerblue4"),
+                         labels = c("Day", "Night"))
+  plot_grid(plot.white, plot.black, plot.hispanic)
 ```
