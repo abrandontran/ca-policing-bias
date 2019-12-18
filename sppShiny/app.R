@@ -21,7 +21,9 @@ ui <-  fluidPage(theme = "bootstrap.min.css",
 
   sidebarLayout(
     sidebarPanel(selectInput("choose_city", "Choose City", choices = c("San Francisco", "Oakland", "San Jose", "Bakersfield", 
-                                                                       "Los Angeles", "San Diego"))),
+                                                                       "Los Angeles", "San Diego")),
+                 
+                 ),
     mainPanel(
       tabsetPanel(
       tabPanel("Looking for Bias", plotOutput("daypie")), 
