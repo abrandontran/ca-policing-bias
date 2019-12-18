@@ -15,7 +15,7 @@ library(cowplot)
 
 
 #Define UI ----
-ui <- fluidPage(theme = "bootstrap.min.css",
+ui <-  fluidPage(theme = "bootstrap.min.css",
                 
   titlePanel("In the Dark: Exploring Racial Disparities in Traffic Stops Before and After Sunset"),
 
@@ -24,7 +24,7 @@ ui <- fluidPage(theme = "bootstrap.min.css",
                                                                        "Los Angeles", "San Diego"))),
     mainPanel(
       tabsetPanel(
-      tabPanel("Plot", plotOutput("daypie")), 
+      tabPanel("Looking for Bias", plotOutput("daypie")), 
       tabPanel("Summary", verbatimTextOutput("summary")))
       
     ))
