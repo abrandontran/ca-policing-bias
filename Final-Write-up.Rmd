@@ -84,6 +84,10 @@ The results show that adjusting the time frame does not give us satisfactory res
 
 However, in a different kind of visualization, we do observe evidence of biased stops. Below, I created pie charts (see Figure 3) where the whole represents all stops for a race. Then, I split the chart by how many of the stops were during the day and how many were at night. While the pie charts below are for LA, charts for 4 other cities looked similar. The similarity lied in how of all white people stops, a much smaller proportion was during the day as compared to day proportions for black people. For coloured folks, the split was more even. This suggests that there is evidence that white drivers may be let off more easily than other races during the day.
 
+Here is a link to the Shiny App: 
+https://preetkhowaja.shinyapps.io/InTheDark/
+
+
 # 5 | Limitations (Brandon & Preet)
 From a statistical standpoint, we cannot generally say any more than the fact that a driver's race is \textbf{not} independent of whether or not a traffic stop is conducted during the daytime or nighttime.  However, local analysis reveals that this independence is individually seen between each non-white race and white stops; that is, there is some indication that the disparity between daytime and nighttime stops for white drivers is different from that of every other race.
 
@@ -249,7 +253,7 @@ chisq.test(ca.hisp$subject_race, ca.hisp$daytime)
 
 **Figure 1: for 10 hours before and after sunset in LA **
 ```{r}
-cadataupdated <- read_csv("Data/cadataupdated.csv")
+cadataupdated <- read_csv("sppShiny/cadataupdated.csv")
 
 stops.day <- cadataupdated %>% filter(city == "la", daytime == "TRUE") %>%
       filter(minsto.set < 600) %>%

@@ -12,6 +12,7 @@ library(tidyverse)
 library(cowplot)
 library(shinythemes)
 
+cadataupdated <- read_csv("cadataupdated.csv")
   #Generating data sets here
 
 
@@ -154,7 +155,7 @@ server <- function(input, output) {
                             "San Diego" = "sd",
                             "Bakersfield" = "bf")
      
-     stops.white <- filter(ca.df, city == select_city, subject_race == "white") %>% 
+     stops.white <- filter(cadataupdated, city == select_city, subject_race == "white") %>% 
        group_by(daytime) %>% 
        tally() %>%
        mutate(proportion = n / sum(n)  ) %>%
@@ -168,7 +169,7 @@ server <- function(input, output) {
        scale_fill_manual(values = c("gold1","dodgerblue4"),
                          labels = c("Day", "Night"))
      
-     stops.black <- filter(ca.df, city == select_city, subject_race == "black") %>% 
+     stops.black <- filter(cadataupdated, city == select_city, subject_race == "black") %>% 
        group_by(daytime) %>% 
        tally() %>%
        mutate(proportion = n / sum(n)  ) %>%
@@ -182,7 +183,7 @@ server <- function(input, output) {
        scale_fill_manual(values = c("gold1","dodgerblue4"),
                          labels = c("Day", "Night"))
      
-     stops.hispanic <- filter(ca.df, city == select_city, subject_race == "hispanic") %>% 
+     stops.hispanic <- filter(cadataupdated, city == select_city, subject_race == "hispanic") %>% 
        group_by(daytime) %>% 
        tally() %>%
        mutate(proportion = n / sum(n)  ) %>%
