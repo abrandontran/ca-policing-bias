@@ -9,13 +9,6 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
-library(dplyr)
-library(tidyverse)
-library(ggplot2)
-library(cowplot)
-```
-
 # 1 | Introduction & Motivation (Preet)
 Investigating racial bias statistically is a fascinating endeavour. It is what motivated us to pick up the Stanford Open Policing Project and apply the analytical tools used in it to six major cities in California. Bias and racial bias, in specific, are psychological and difficult to find in terms of direct causation. However, the challenge of using statistical tools, which are very concrete, to find evidence for racial bias, difficult to read through numbers, is what made this project very interesting for us. 
 
@@ -252,6 +245,13 @@ chisq.test(ca.hisp$subject_race, ca.hisp$daytime)
 \newpage
 
 **Figure 1: for 10 hours before and after sunset in LA **
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(cowplot)
+```
+
 ```{r}
 cadataupdated <- read_csv("sppShiny/cadataupdated.csv")
 
